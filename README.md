@@ -1,232 +1,147 @@
-# 🚀 Adaptive Cross-Validation under Concept Drift for Time Series Forecasting
+# 📈 โครงการพยากรณ์หุ้นด้วย Time Series (NVIDIA, META, TSLA)
 
 <div align="center">
 
-![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
-![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange.svg)
-![Pandas](https://img.shields.io/badge/Pandas-1.3+-green.svg)
-![Scikit-learn](https://img.shields.io/badge/Scikit--learn-1.0+-red.svg)
+![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
+![Jupyter](https://img.shields.io/badge/Jupyter-Notebook-orange.svg)
+![Pandas](https://img.shields.io/badge/Pandas-1.x-green.svg)
+![Scikit-learn](https://img.shields.io/badge/Scikit--learn-1.x-red.svg)
 
-**Advanced Time Series Forecasting Project**  
-*Capstone Project for Applied Statistics (Data Science)*
+**ชุดโน้ตบุ๊กสำหรับสำรวจข้อมูลและพยากรณ์ราคาหุ้นในตลาดสหรัฐฯ**
 
-[📊 View Results](#results) • [🔧 Installation](#installation) • [📚 Usage](#usage)
+[📦 การติดตั้ง](#-การติดตั้ง) • [▶️ วิธีใช้งาน](#%EF%B8%8F-วิธีใช้งาน) • [🗂 โครงสร้างโปรเจกต์](#-โครงสร้างโปรเจกต์) • [📊 ข้อมูลชุดข้อมูล](#-ข้อมูลชุดข้อมูล)
 
 </div>
 
 ---
 
-## 📋 Project Overview
+## 📌 ภาพรวมโครงการ
+โปรเจกต์นี้รวบรวม Jupyter Notebook สำหรับการวิเคราะห์และพยากรณ์ราคาหุ้นรายบริษัท ได้แก่ NVIDIA (NVDA), Meta (META) และ Tesla (TSLA) โดยมีทั้งส่วนของการทำความสะอาด/สำรวจข้อมูล การสร้างกราฟ และการสร้างแบบจำลองพยากรณ์เชิงเวลา (Time Series Forecasting) แบบง่าย อ่านเข้าใจง่าย และสามารถทำตามได้ทันที
 
-This project implements **Adaptive Time Series Forecasting** with **Concept Drift Detection** to predict NVIDIA stock prices. The system automatically detects when the underlying data distribution changes and adapts the model accordingly, leading to improved prediction accuracy.
-
-### 🎯 Key Objectives
-- **Detect Data Drift**: Automatically identify when stock market conditions change
-- **Adaptive Retraining**: Dynamically retrain models when drift is detected
-- **Performance Comparison**: Compare adaptive vs. traditional forecasting methods
-- **Real-time Adaptation**: Handle concept drift in financial time series data
+จุดมุ่งหมายหลัก:
+- ทำความเข้าใจแนวโน้มราคาและปริมาณการซื้อขายย้อนหลัง 10 ปี
+- เปรียบเทียบผลการพยากรณ์ระยะสั้นระหว่างบริษัทต่าง ๆ
+- สร้างกราฟที่อ่านง่าย เพื่อนำเสนอผลได้อย่างสละสลวย
 
 ---
 
-## 🏗️ Architecture & Methodology
+## 🗂 ไฟล์สำคัญในโปรเจกต์
+โน้ตบุ๊กและไฟล์ข้อมูลที่มีอยู่ในโปรเจกต์นี้:
 
-### 🔄 Adaptive Forecasting Pipeline
+- `NVDIA_forecast.ipynb` — โน้ตบุ๊กสำหรับพยากรณ์ราคาหุ้น NVIDIA (NVDA)
+- `META_forecast.ipynb` — โน้ตบุ๊กสำหรับพยากรณ์ราคาหุ้น Meta (META)
+- `TSLA_forecast.ipynb` — โน้ตบุ๊กสำหรับพยากรณ์ราคาหุ้น Tesla (TSLA)
+- `Stock_Plot.ipynb` — สร้างกราฟและสำรวจข้อมูลราคาหุ้น
+- `Compare.ipynb` — เปรียบเทียบผลการพยากรณ์/สรุปผลระหว่างหุ้น
+- `describe.ipynb` — สรุปสถิติเชิงพรรณนา (Descriptive Statistics)
+- `Testtt.ipynb`, `Untitled-1.ipynb` — โน้ตบุ๊กทดลอง/ฉบับร่าง
 
-```mermaid
-graph LR
-    A[Raw Stock Data] --> B[Feature Engineering]
-    B --> C[Sequence Generation]
-    C --> D[Model Training]
-    D --> E[Drift Detection]
-    E --> F{Drift Detected?}
-    F -->|Yes| G[Retrain Model]
-    F -->|No| H[Continue Prediction]
-    G --> D
-    H --> I[Performance Evaluation]
-```
+ไฟล์ข้อมูล (CSV):
+- `nvidia_10yr_data.csv` — ข้อมูล NVDA ย้อนหลัง ~10 ปี
+- `META_10yr_data.csv` — ข้อมูล META ย้อนหลัง ~10 ปี
+- `TSLA_10yr_data.csv` — ข้อมูล TSLA ย้อนหลัง ~10 ปี
 
-### 🧠 Models Implemented
-
-| Model Type | Architecture | Use Case |
-|------------|--------------|----------|
-| **RNN** | Simple Recurrent Neural Network | Baseline comparison |
-| **LSTM** | Long Short-Term Memory | Primary forecasting |
-| **GRU** | Gated Recurrent Unit | Alternative to LSTM |
-| **Linear** | Linear Regression | Traditional baseline |
-
-### 🔍 Drift Detection Methods
-
-- **KS Test**: Kolmogorov-Smirnov test for distribution changes
-- **Mann-Whitney U**: Non-parametric drift detection
-- **Cohen's d**: Effect size measurement for drift significance
+หมายเหตุ: ชื่อไฟล์บางส่วนใช้ตัวพิมพ์ใหญ่-เล็กต่างกัน กรุณาอ้างอิงชื่อไฟล์ให้ตรงตามจริงเมื่อใช้งานในโค้ด
 
 ---
 
-## 📊 Dataset
-
-**NVIDIA Stock Data (2015-2024)**
-- **Period**: 10 years of historical data
-- **Records**: 2,507 trading days
-- **Features**: OHLCV + engineered features
-- **Source**: Historical stock market data
-
-### 🎨 Feature Engineering
-
-| Feature | Description | Formula |
-|---------|-------------|---------|
-| `Return` | Daily price change | `(Close_t - Close_{t-1}) / Close_{t-1}` |
-| `Volatility` | Rolling standard deviation | `std(Close, window=10)` |
-| `Price_Diff` | High-Low spread | `High - Low` |
-| `Volume_Log` | Log-transformed volume | `log(1 + Volume)` |
-
----
-
-## 🚀 Quick Start
-
-### 📥 Installation
+## 📦 การติดตั้ง
+แนะนำให้ใช้ Python 3.10 ขึ้นไป และติดตั้งไลบรารีจาก `requirements.txt`
 
 ```bash
-# Clone the repository
-git clone <repository-url>
-cd drift-cv-forecasting
-
-# Install dependencies
 pip install -r requirements.txt
 ```
 
-### 🔧 Dependencies
+หากยังไม่มี Jupyter Notebook ให้ติดตั้งเพิ่ม:
 
-```txt
-tensorflow>=2.8.0
-pandas>=1.3.0
-numpy>=1.21.0
-scikit-learn>=1.0.0
-matplotlib>=3.5.0
-seaborn>=0.11.0
-scipy>=1.7.0
+```bash
+pip install notebook
 ```
 
-### 📚 Usage
+จากนั้นเปิดโน้ตบุ๊กในโฟลเดอร์โปรเจกต์นี้ด้วยคำสั่ง:
 
-#### 1. Run AdaptiveVSbaseline
-```python
-# Execute the main experiment
-jupyter notebook AdaptiveVSbaseline.ipynb
-```
-
-#### 2. Generate Visualizations
-```python
-# Create plots and charts
-jupyter notebook Nvdia_Plot.ipynb
+```bash
+jupyter notebook | cat
 ```
 
 ---
 
-## 📈 Results & Performance
+## ▶️ วิธีใช้งาน
+แนะนำลำดับการใช้งานเพื่อให้ง่ายต่อการทำความเข้าใจและนำเสนอผลลัพธ์:
 
-### 🎯 Key Findings
+1) เปิด `describe.ipynb` เพื่อดูสถิติเบื้องต้นของข้อมูลทั้งสามบริษัท
+2) เปิด `Stock_Plot.ipynb` เพื่อสร้างกราฟแนวโน้มราคา ปริมาณ และอินดิเคเตอร์พื้นฐาน
+3) รันโน้ตบุ๊กการพยากรณ์แต่ละบริษัท:
+   - `NVDIA_forecast.ipynb`
+   - `META_forecast.ipynb`
+   - `TSLA_forecast.ipynb`
+4) สุดท้ายเปิด `Compare.ipynb` เพื่อนำผลการพยากรณ์มาเปรียบเทียบและสรุปภาพรวม
 
-- **Adaptive Models**: Outperform traditional methods in drift scenarios
-- **Drift Detection**: Successfully identifies market regime changes
-- **Performance Gain**: Improved RMSE with adaptive retraining
-- **Real-time Adaptation**: Models automatically adjust to new market conditions
-
-### 📊 Performance Metrics
-
-| Metric | Traditional | Adaptive | Improvement |
-|--------|-------------|----------|-------------|
-| **RMSE** | Baseline | -15% | ✅ |
-| **MAE** | Baseline | -12% | ✅ |
-| **R² Score** | Baseline | +8% | ✅ |
-| **Drift Response** | Static | Dynamic | ✅ |
+คำแนะนำการรัน:
+- ตรวจสอบว่าไฟล์ CSV อยู่ในไดเรกทอรีเดียวกับโน้ตบุ๊ก
+- หากใช้เส้นทางไฟล์ (path) กำหนดให้ตรงกับชื่อไฟล์จริง (ระวังตัวพิมพ์ใหญ่-เล็ก)
+- ตั้งค่า random seed (ถ้ามี) เพื่อให้ผลลัพธ์ทำซ้ำได้ง่ายขึ้น
 
 ---
 
-## 🔬 Technical Details
+## 📊 ข้อมูลชุดข้อมูล
+- แหล่งที่มา: ข้อมูลราคาหุ้นย้อนหลัง (OHLCV) เป็นรายวัน
+- ช่วงเวลา: ประมาณ 10 ปีล่าสุดสำหรับแต่ละบริษัท
+- ฟีเจอร์หลัก: Open, High, Low, Close, Volume และฟีเจอร์ที่สร้างเพิ่มในบางโน้ตบุ๊ก (เช่น ผลตอบแทนรายวัน ความผันผวนแบบกลิ้ง)
 
-### 🧮 Sequence Generation
-
-```python
-class SequenceGenerator:
-    def __init__(self, sequence_length: int = 30):
-        self.sequence_length = sequence_length
-        self.scaler_X = StandardScaler()
-        self.scaler_y = StandardScaler()
-```
-
-### 🎛️ Model Configuration
-
-```python
-class RNNRegressor:
-    def __init__(self, 
-                 model_type: str = 'LSTM',
-                 sequence_length: int = 30,
-                 units: int = 50,
-                 dropout_rate: float = 0.2,
-                 learning_rate: float = 0.001):
-```
-
-### 🔄 Adaptive Retraining
-
-The system automatically:
-1. **Monitors** prediction errors
-2. **Detects** distribution changes
-3. **Triggers** model retraining
-4. **Updates** forecasting parameters
+การใช้งานข้อมูล:
+- โหลดไฟล์ CSV ด้วย `pandas.read_csv`
+- แปลงคอลัมน์วันที่เป็นชนิด datetime และตั้งเป็นดัชนีเวลา (ถ้าจำเป็น)
+- จัดการค่าที่หายไปก่อนทำการวิเคราะห์
 
 ---
 
-## 📁 Project Structure
+## 🧪 วิธีประเมินผล (โดยสังเขป)
+- ใช้การแบ่งชุดข้อมูลตามเวลา (train/test split แบบไม่สลับลำดับ)
+- วัดผลด้วยเมตริกเช่น RMSE/MAE และวิเคราะห์กราฟคาดการณ์เทียบกับค่าจริง
+- ใน `Compare.ipynb` อาจมีการสรุปผลลัพธ์เพื่อดูบริษัทที่พยากรณ์ได้แม่นยำกว่าในช่วงที่สนใจ
+
+---
+
+## 🗂 โครงสร้างโปรเจกต์
 
 ```
-drift-cv-forecasting/
-├── 📊 AdaptiveVSbaseline.ipynb  # Main experiment
-├── 📈 Nvdia_Plot.ipynb                          # Visualization notebook
-├── 📄 nvidia_10yr_data.csv                      # Stock price dataset
-├── 📖 README.md                                  # This file
-└── 🔧 requirements.txt                           # Dependencies
+.
+├── Compare.ipynb
+├── describe.ipynb
+├── META_10yr_data.csv
+├── META_forecast.ipynb
+├── NVDIA_forecast.ipynb
+├── nvidia_10yr_data.csv
+├── README.md
+├── requirements.txt
+├── Stock_Plot.ipynb
+├── Testtt.ipynb
+├── TSLA_10yr_data.csv
+├── TSLA_forecast.ipynb
+└── Untitled-1.ipynb
 ```
 
 ---
 
-## 🎓 Academic Context
-
-This project was developed as a **Capstone Project** for the Bachelor's degree in **Applied Statistics (Data Science)**, focusing on:
-
-- **Time Series Analysis**
-- **Machine Learning**
-- **Financial Forecasting**
-- **Concept Drift Detection**
+## 💡 เคล็ดลับเพื่อการนำเสนอให้สละสลวย
+- ใช้กราฟแบบสีอ่านง่ายและสอดคล้องกันทั้งโปรเจกต์
+- ใส่หัวข้อย่อยและคำอธิบายสั้น ๆ ในแต่ละเซลล์ของโน้ตบุ๊ก
+- แสดงตารางสรุปเมตริกที่สำคัญไว้ตอนท้ายของแต่ละโน้ตบุ๊ก
+- หากเปรียบเทียบหลายโมเดล ให้ใช้รูปแบบตารางเดียวกันเพื่อดูความต่างได้ชัดเจน
 
 ---
 
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-### 📝 Development Guidelines
-
-1. **Code Style**: Follow PEP 8 guidelines
-2. **Documentation**: Add docstrings for new functions
-3. **Testing**: Include unit tests for new features
-4. **Notebooks**: Clear cell outputs and markdown explanations
-
----
-
-## 🙏 Acknowledgments
-
-- **NVIDIA Corporation** for historical stock data
-- **Academic Advisors** for guidance and feedback
-- **Open Source Community** for tools and libraries
+## 📮 ข้อเสนอแนะ & การพัฒนาเพิ่มเติม
+- เพิ่มโมเดลพยากรณ์อื่น ๆ (เช่น ARIMA/Prophet/LSTM) เพื่อเปรียบเทียบ
+- เพิ่มขั้นตอนตรวจจับ concept drift แบบง่ายสำหรับช่วงเวลาที่ตลาดเปลี่ยนโหมด
+- ทำ workflow อัตโนมัติเล็ก ๆ เพื่อรันทุกโน้ตบุ๊กและสรุปผลในรายงานเดียว
 
 ---
 
 <div align="center">
 
-**Made with ❤️ for Data Science Education**
-
-[⬆️ Back to Top](#-nvidia-stock-price-forecasting-with-adaptive-drift-detection)
-
+**สร้างเพื่อการเรียนรู้และการนำเสนอผลการวิเคราะห์เชิงเวลาอย่างเข้าใจง่าย**
 
 </div>
 
