@@ -19,11 +19,11 @@ class ModelComparison:
             print(f"\n{'='*50}")
             print(f"Testing {model_type} Model")
             print(f"{'='*50}")
-            # Adaptive CV ใช้จุด drift ทั้งหมดที่ตรวจพบ
+            # Adaptive CV uses all detected drift points
             drift_cv = DriftAdaptiveTimeSeriesCV(model_type, params)
             drift_rmse, drift_mae = drift_cv.run(X, y, drift_points)
             
-            # Baseline CV ใช้การแบ่ง 5-fold แบบปกติ
+            # Baseline CV uses standard 5-fold splitting
             baseline_cv = BaselineTimeSeriesCV(model_type, params, n_splits=5)
             base_rmse, base_mae = baseline_cv.run(X, y)
             
@@ -36,15 +36,15 @@ class ModelComparison:
         print("📊 MODEL COMPARISON SUMMARY")
         print("="*100)
         
-        # แสดงข้อมูล Drift Points
+        # Display drift points information
         if drift_points and drift_dates:
             print(f"\n🔍 CONCEPT DRIFT DETECTION RESULTS")
             print("-" * 50)
-            print(f"📅 จำนวน Drift Points ที่ตรวจพบ: {len(drift_points)}")
-            print(f"📍 Drift Points (Index): {drift_points}")
-            print(f"📅 Drift Dates: {drift_dates}")
+            print(f"📅 Number of drift points detected: {len(drift_points)}")
+            print(f"📍 Drift points (index): {drift_points}")
+            print(f"📅 Drift dates: {drift_dates}")
         
-        # สร้างตารางเปรียบเทียบ
+        # Create comparison table
         print(f"\n📈 MODEL PERFORMANCE COMPARISON")
         print("-" * 100)
         print(f"{'Model':<10} {'Strategy':<15} {'Avg RMSE':<12} {'Avg MAE':<12} {'Folds':<8} {'Status':<10}")
@@ -70,7 +70,7 @@ class ModelComparison:
                 else:
                     print(f"{model_type:<10} {'Baseline CV':<15} {'N/A':<12} {'N/A':<12} {'0':<8} {'❌ No Data':<10}")
         
-        # แสดงผลลัพธ์ที่ดีที่สุด
+        # Display best performing model
         best_model = self._find_best_model(results)
         if best_model:
             print(f"\n🏆 BEST PERFORMING MODEL")
@@ -97,15 +97,15 @@ class ModelComparison:
             f.write("="*100 + "\n")
             f.write(f"📅 Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
             
-            # แสดงข้อมูล Drift Points
+            # Display drift points information
             if drift_points and drift_dates:
                 f.write("🔍 CONCEPT DRIFT DETECTION RESULTS\n")
                 f.write("-" * 50 + "\n")
-                f.write(f"📅 จำนวน Drift Points ที่ตรวจพบ: {len(drift_points)}\n")
-                f.write(f"📍 Drift Points (Index): {drift_points}\n")
-                f.write(f"📅 Drift Dates: {drift_dates}\n\n")
+                f.write(f"📅 Number of drift points detected: {len(drift_points)}\n")
+                f.write(f"📍 Drift points (index): {drift_points}\n")
+                f.write(f"📅 Drift dates: {drift_dates}\n\n")
             
-            # สร้างตารางเปรียบเทียบ
+            # Create comparison table
             f.write("📈 MODEL PERFORMANCE COMPARISON\n")
             f.write("-" * 100 + "\n")
             f.write(f"{'Model':<10} {'Strategy':<15} {'Avg RMSE':<12} {'Avg MAE':<12} {'Folds':<8} {'Status':<10}\n")
@@ -131,7 +131,7 @@ class ModelComparison:
                     else:
                         f.write(f"{model_type:<10} {'Baseline CV':<15} {'N/A':<12} {'N/A':<12} {'0':<8} {'No Data':<10}\n")
             
-            # แสดงผลลัพธ์ที่ดีที่สุด
+            # Display best performing model
             best_model = self._find_best_model(results)
             if best_model:
                 f.write(f"\n🏆 BEST PERFORMING MODEL\n")
@@ -143,7 +143,7 @@ class ModelComparison:
                         best_avg_rmse = np.mean(best_scores)
                         f.write(f"📊 Best Average RMSE: {best_avg_rmse:.3f}\n")
             
-            # แสดงรายละเอียดแต่ละ fold
+            # Display detailed results for each fold
             f.write(f"\n📋 DETAILED FOLD RESULTS\n")
             f.write("="*100 + "\n")
             

@@ -55,7 +55,7 @@ class RNNRegressor:
         model = Sequential([
             LayerType(self.units, return_sequences=True, input_shape=input_shape),
             Dropout(self.dropout_rate),
-            LayerType(self.units // 2, return_sequences=True), # เพิ่มเลเยอร์
+            LayerType(self.units // 2, return_sequences=True), # Add layer
             Dropout(self.dropout_rate),
             LayerType(self.units // 4),
             Dropout(self.dropout_rate),
@@ -69,7 +69,7 @@ class RNNRegressor:
         X_seq, y_seq = self.seq_generator.create_sequences(X, y, fit_scalers=True)
         if len(X_seq) == 0: raise ValueError("Not enough data to create sequences")
         self.model = self._build_model((X_seq.shape[1], X_seq.shape[2]))
-        early_stopping = EarlyStopping(monitor='loss', patience=20, restore_best_weights=True) # เพิ่ม patience
+        early_stopping = EarlyStopping(monitor='loss', patience=20, restore_best_weights=True) # Increase patience
         self.model.fit(X_seq, y_seq, epochs=self.epochs, batch_size=self.batch_size, callbacks=[early_stopping], verbose=self.verbose)
         return self
     

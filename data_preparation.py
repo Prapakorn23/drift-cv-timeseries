@@ -39,7 +39,7 @@ class DataPreparator:
         df['Volume_Log'] = np.log1p(df['Volume'])
         df['Return_Volume'] = df['Return'] * df['Volume_Log']
         
-        # Drop NaN after rolling calculations
+        # Drop NaN values after rolling calculations
         df.dropna(inplace=True)
 
         X = df[['Return', 'Volatility','Volume_Log', 'Return_Volume']]

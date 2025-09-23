@@ -6,7 +6,7 @@ from models import RNNRegressor, LinearRegressionModel
 
 class DriftAdaptiveTimeSeriesCV:
     """Performs cross-validation using a rolling window approach based on detected drift points.
-    แก้ไขให้ข้ามจุด drift ที่แบ่ง train/test ไม่ได้"""
+    Modified to skip drift points that cannot be split for train/test"""
     def __init__(self, model_type: str = 'LSTM', model_params: dict = None):
         self.model_type = model_type.upper()
         self.model_params = model_params or {}
@@ -31,12 +31,12 @@ class DriftAdaptiveTimeSeriesCV:
             train_len = train_end - train_start
             test_len = test_end - test_start
 
-            # เงื่อนไขสำหรับ Linear ไม่ต้องใช้ seq_len
+            # Conditions for Linear model (no need for seq_len)
             if self.model_type == 'LINEAR':
                 if train_len <= 0 or test_len <= 0:
                     print(f"[Adaptive Fold {i+1}] Skipping (train/test < 1): train({train_len}), test({test_len})")
                     continue
-            else: # เงื่อนไขสำหรับ RNN/LSTM/GRU
+            else: # Conditions for RNN/LSTM/GRU
                 if train_len <= seq_len or test_len <= seq_len:
                     print(f"[Adaptive Fold {i+1}] Skipping (train/test < seq_len): train({train_len}), test({test_len}), seq_len({seq_len})")
                     continue
@@ -50,7 +50,7 @@ class DriftAdaptiveTimeSeriesCV:
             train_len = train_end - train_start
             test_len = test_end - test_start
 
-            # ตรวจสอบ train/test ต้องมีขนาดมากกว่า sequence_length
+            # Check that train/test must be larger than sequence_length
             if train_len <= seq_len or test_len <= seq_len:
                 print(f"[Adaptive Fold {i+1}] Skipping (train/test < seq_len): train({train_len}), test({test_len}), seq_len({seq_len})")
                 continue
@@ -112,16 +112,16 @@ class BaselineTimeSeriesCV:
             raise ValueError("Not enough data for the specified number of splits.")
 
         for i in range(self.n_splits):
-            # กำหนดช่วงข้อมูลสำหรับ Fold ปัจจุบัน (ข้อมูลส่วนที่ i+1)
+            # Define data range for current fold (data section i+1)
             fold_start = i * part_size
             fold_end = (i + 1) * part_size
-            if i == self.n_splits - 1: # จัดการส่วนสุดท้ายที่อาจมีขนาดไม่เท่ากัน
+            if i == self.n_splits - 1: # Handle the last section which may have different size
                 fold_end = total_size
 
             fold_data_X = X.iloc[fold_start:fold_end]
             fold_data_y = y.iloc[fold_start:fold_end]
 
-            # แบ่งชุดข้อมูลภายใน Fold เป็น Train และ Test
+            # Split data within fold into Train and Test
             split_point = int(len(fold_data_X) * (1 - test_ratio))
             
             X_train = fold_data_X.iloc[:split_point]
