@@ -21,7 +21,10 @@ tf.random.set_seed(42)
 # Disable TensorFlow multi-threading
 tf.config.threading.set_intra_op_parallelism_threads(1)
 
+# Suppress all warnings
 warnings.filterwarnings('ignore')
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # Suppress TensorFlow info, warnings, and errors
+tf.get_logger().setLevel('ERROR')  # Suppress TensorFlow warnings
 
 def main():
     """Main function to run the model comparison analysis."""
@@ -78,23 +81,21 @@ def main():
         results = comparator.compare_models(X, y, drift_points)
         
         # Display results
-        comparator.print_summary(results, drift_points, drift_dates_formatted)
+        comparator.print_summary(results, drift_points, drift_dates_formatted, csv_path)
         
-        # Export results to .txt file
-        print("\n💾 Saving results...")
-        export_filename = comparator.export_results(results, drift_points, drift_dates_formatted)
-        print(f"✅ Results saved successfully: {export_filename}")
-        
-        # Ask user if they want to export with custom filename
+        # Ask user for filename before saving
+        print("\n💾 Save results to file...")
         try:
-            custom_filename = input("\nDo you want to save with a custom filename? (Press Enter to skip): ").strip()
-            if custom_filename:
-                if not custom_filename.endswith('.txt'):
-                    custom_filename += '.txt'
-                export_filename = comparator.export_results(results, drift_points, drift_dates_formatted, custom_filename)
+            save_filename = input("Enter filename to save results (without .txt extension, or press Enter to skip): ").strip()
+            if save_filename:
+                if not save_filename.endswith('.txt'):
+                    save_filename += '.txt'
+                export_filename = comparator.export_results(results, drift_points, drift_dates_formatted, save_filename, csv_path)
                 print(f"✅ Results saved successfully: {export_filename}")
+            else:
+                print("⏭️ Skipping file save")
         except KeyboardInterrupt:
-            print("\n⏭️ Skipping additional file save")
+            print("\n⏭️ Skipping file save")
         
     except FileNotFoundError:
         print(f"❌ Error: File '{csv_path}' not found. Please check the path again.")

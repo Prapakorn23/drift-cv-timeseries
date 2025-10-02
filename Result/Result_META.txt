@@ -1,0 +1,131 @@
+====================================================================================================
+📊 MODEL COMPARISON RESULTS
+====================================================================================================
+📅 Generated on: 2025-09-30 02:58:40
+📁 Analyzed file: C:\Users\praph\Desktop\Edit_result - สำเนา\Data_stocks\META_10yr_data.csv
+
+🔍 CONCEPT DRIFT DETECTION RESULTS
+--------------------------------------------------
+📅 Number of drift points detected: 13
+📍 Drift points (index): [191, 415, 575, 735, 895, 1055, 1247, 1407, 1567, 1727, 1887, 2047, 2239]
+📅 Drift dates: ['14/10/2015', '02/09/2016', '25/04/2017', '11/12/2017', '01/08/2018', '22/03/2019', '24/12/2019', '13/08/2020', '05/04/2021', '18/11/2021', '12/07/2022', '01/03/2023', '04/12/2023']
+
+📈 MODEL PERFORMANCE COMPARISON
+----------------------------------------------------------------------------------------------------
+Model      Strategy        Avg RMSE     Avg MAE      Folds    Status    
+----------------------------------------------------------------------------------------------------
+RNN        Adaptive CV     26.081       23.642       14       Valid     
+RNN        Baseline CV     42.719       38.349       5        Valid     
+LSTM       Adaptive CV     25.031       22.384       14       Valid     
+LSTM       Baseline CV     43.985       38.080       5        Valid     
+GRU        Adaptive CV     23.385       21.074       14       Valid     
+GRU        Baseline CV     38.480       34.068       5        Valid     
+LINEAR     Adaptive CV     30.125       27.830       14       Valid     
+LINEAR     Baseline CV     62.270       57.953       5        Valid     
+
+🏆 BEST PERFORMING MODEL
+--------------------------------------------------
+🥇 Winner: GRU
+📊 Best Average RMSE: 23.385
+
+📋 DETAILED FOLD RESULTS
+====================================================================================================
+
+RNN MODEL DETAILS:
+--------------------------------------------------
+Adaptive CV Results:
+  Fold 1: RMSE=4.793, MAE=3.376
+  Fold 2: RMSE=8.894, MAE=8.541
+  Fold 3: RMSE=10.645, MAE=10.520
+  Fold 4: RMSE=8.933, MAE=8.377
+  Fold 5: RMSE=19.590, MAE=18.074
+  Fold 6: RMSE=15.305, MAE=13.342
+  Fold 7: RMSE=15.287, MAE=14.146
+  Fold 8: RMSE=45.074, MAE=35.898
+  Fold 9: RMSE=13.417, MAE=11.706
+  Fold 10: RMSE=16.982, MAE=14.789
+  Fold 11: RMSE=40.193, MAE=39.887
+  Fold 12: RMSE=39.689, MAE=30.543
+  Fold 13: RMSE=39.208, MAE=36.258
+  Fold 14: RMSE=87.125, MAE=85.534
+Baseline CV Results:
+  Fold 1: RMSE=29.155, MAE=25.930
+  Fold 2: RMSE=21.822, MAE=17.266
+  Fold 3: RMSE=10.852, MAE=9.241
+  Fold 4: RMSE=77.296, MAE=75.947
+  Fold 5: RMSE=74.468, MAE=63.363
+
+LSTM MODEL DETAILS:
+--------------------------------------------------
+Adaptive CV Results:
+  Fold 1: RMSE=6.996, MAE=5.096
+  Fold 2: RMSE=10.845, MAE=10.626
+  Fold 3: RMSE=11.723, MAE=10.193
+  Fold 4: RMSE=8.699, MAE=7.787
+  Fold 5: RMSE=21.315, MAE=19.420
+  Fold 6: RMSE=6.419, MAE=4.854
+  Fold 7: RMSE=19.343, MAE=18.574
+  Fold 8: RMSE=35.668, MAE=26.465
+  Fold 9: RMSE=15.403, MAE=13.291
+  Fold 10: RMSE=23.455, MAE=20.944
+  Fold 11: RMSE=38.823, MAE=38.346
+  Fold 12: RMSE=37.569, MAE=28.916
+  Fold 13: RMSE=24.341, MAE=20.930
+  Fold 14: RMSE=89.836, MAE=87.938
+Baseline CV Results:
+  Fold 1: RMSE=24.595, MAE=22.454
+  Fold 2: RMSE=30.830, MAE=24.194
+  Fold 3: RMSE=14.043, MAE=11.622
+  Fold 4: RMSE=79.288, MAE=72.705
+  Fold 5: RMSE=71.171, MAE=59.426
+
+GRU MODEL DETAILS:
+--------------------------------------------------
+Adaptive CV Results:
+  Fold 1: RMSE=7.410, MAE=5.675
+  Fold 2: RMSE=11.980, MAE=11.509
+  Fold 3: RMSE=11.963, MAE=10.625
+  Fold 4: RMSE=9.524, MAE=8.857
+  Fold 5: RMSE=19.622, MAE=17.782
+  Fold 6: RMSE=11.170, MAE=8.980
+  Fold 7: RMSE=14.812, MAE=12.887
+  Fold 8: RMSE=24.983, MAE=21.340
+  Fold 9: RMSE=11.716, MAE=9.573
+  Fold 10: RMSE=26.825, MAE=23.743
+  Fold 11: RMSE=32.645, MAE=32.197
+  Fold 12: RMSE=31.168, MAE=24.852
+  Fold 13: RMSE=29.089, MAE=24.563
+  Fold 14: RMSE=84.489, MAE=82.459
+Baseline CV Results:
+  Fold 1: RMSE=30.294, MAE=28.098
+  Fold 2: RMSE=17.145, MAE=13.145
+  Fold 3: RMSE=13.844, MAE=10.635
+  Fold 4: RMSE=66.213, MAE=63.026
+  Fold 5: RMSE=64.902, MAE=55.436
+
+LINEAR MODEL DETAILS:
+--------------------------------------------------
+Adaptive CV Results:
+  Fold 1: RMSE=8.753, MAE=7.604
+  Fold 2: RMSE=12.118, MAE=11.396
+  Fold 3: RMSE=12.123, MAE=11.932
+  Fold 4: RMSE=16.977, MAE=16.361
+  Fold 5: RMSE=21.464, MAE=19.464
+  Fold 6: RMSE=10.702, MAE=9.873
+  Fold 7: RMSE=12.035, MAE=10.936
+  Fold 8: RMSE=50.188, MAE=46.443
+  Fold 9: RMSE=12.052, MAE=10.152
+  Fold 10: RMSE=10.410, MAE=8.949
+  Fold 11: RMSE=74.466, MAE=69.724
+  Fold 12: RMSE=31.582, MAE=24.484
+  Fold 13: RMSE=49.068, MAE=47.188
+  Fold 14: RMSE=99.806, MAE=95.110
+Baseline CV Results:
+  Fold 1: RMSE=27.630, MAE=27.162
+  Fold 2: RMSE=25.890, MAE=22.119
+  Fold 3: RMSE=16.034, MAE=13.440
+  Fold 4: RMSE=88.259, MAE=86.719
+  Fold 5: RMSE=153.538, MAE=140.327
+
+====================================================================================================
+End of Report

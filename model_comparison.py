@@ -30,11 +30,16 @@ class ModelComparison:
             results[model_type] = {'adaptive_rmse': drift_rmse, 'adaptive_mae': drift_mae, 'baseline_rmse': base_rmse, 'baseline_mae': base_mae}
         return results
     
-    def print_summary(self, results: Dict, drift_points: List[int] = None, drift_dates: List[str] = None):
+    def print_summary(self, results: Dict, drift_points: List[int] = None, drift_dates: List[str] = None, filename: str = None):
         """Print formatted summary of model comparison results."""
         print("\n" + "="*100)
         print("📊 MODEL COMPARISON SUMMARY")
         print("="*100)
+        
+        # Display analyzed filename
+        if filename:
+            print(f"📁 Analyzed file: {filename}")
+            print("-" * 50)
         
         # Display drift points information
         if drift_points and drift_dates:
@@ -85,7 +90,7 @@ class ModelComparison:
         print("\n" + "="*100)
     
     def export_results(self, results: Dict, drift_points: List[int] = None, 
-                      drift_dates: List[str] = None, filename: str = None) -> str:
+                      drift_dates: List[str] = None, filename: str = None, analyzed_file: str = None) -> str:
         """Export results to a text file."""
         if filename is None:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -95,7 +100,13 @@ class ModelComparison:
             f.write("="*100 + "\n")
             f.write("📊 MODEL COMPARISON RESULTS\n")
             f.write("="*100 + "\n")
-            f.write(f"📅 Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+            f.write(f"📅 Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+            
+            # Display analyzed filename
+            if analyzed_file:
+                f.write(f"📁 Analyzed file: {analyzed_file}\n")
+            
+            f.write("\n")
             
             # Display drift points information
             if drift_points and drift_dates:
