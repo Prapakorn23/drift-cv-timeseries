@@ -62,6 +62,7 @@ def main():
         print(f"📅 Number of drift points detected: {len(drift_points)}")
         print(f"📍 Drift points (index): {drift_points}")
         print(f"📅 Drift dates: {drift_dates_formatted}")
+
         
         # Set parameters
         rnn_params = {
@@ -83,14 +84,26 @@ def main():
         # Display results
         comparator.print_summary(results, drift_points, drift_dates_formatted, csv_path)
         
-        # Ask user for filename before saving
+        # Ask user for filename and format before saving
         print("\n💾 Save results to file...")
         try:
-            save_filename = input("Enter filename to save results (without .txt extension, or press Enter to skip): ").strip()
-            if save_filename:
-                if not save_filename.endswith('.txt'):
-                    save_filename += '.txt'
-                export_filename = comparator.export_results(results, drift_points, drift_dates_formatted, save_filename, csv_path)
+            file_format = input("Choose file format (1 for TXT, 2 for CSV, or press Enter to skip): ").strip()
+            if file_format in ['1', '2']:
+                save_filename = input("Enter filename (without extension, or press Enter for default): ").strip()
+                if save_filename:
+                    if file_format == '1':
+                        if not save_filename.endswith('.txt'):
+                            save_filename += '.txt'
+                        export_filename = comparator.export_results(results, drift_points, drift_dates_formatted, save_filename, csv_path)
+                    else:  # file_format == '2'
+                        if not save_filename.endswith('.csv'):
+                            save_filename += '.csv'
+                        export_filename = comparator.export_results_csv(results, drift_points, drift_dates_formatted, save_filename, csv_path)
+                else:
+                    if file_format == '1':
+                        export_filename = comparator.export_results(results, drift_points, drift_dates_formatted, None, csv_path)
+                    else:  # file_format == '2'
+                        export_filename = comparator.export_results_csv(results, drift_points, drift_dates_formatted, None, csv_path)
                 print(f"✅ Results saved successfully: {export_filename}")
             else:
                 print("⏭️ Skipping file save")

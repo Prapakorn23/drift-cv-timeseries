@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from typing import Tuple, List
+from typing import Tuple, List, Dict
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 from models import RNNRegressor, LinearRegressionModel
 
@@ -11,11 +11,17 @@ class DriftAdaptiveTimeSeriesCV:
         self.model_type = model_type.upper()
         self.model_params = model_params or {}
 
-    def run(self, X: pd.DataFrame, y: pd.Series, drift_points: List[int]) -> Tuple[List[float], List[float]]:
+    def run(self, X: pd.DataFrame, y: pd.Series, drift_points: List[int]) -> Dict:
         metrics_rmse, metrics_mae = [], []
+        before_drift_rmse, before_drift_mae = [], []
+        after_drift_rmse, after_drift_mae = [], []
+        
         seq_len = self.model_params.get('sequence_length', 30)
         min_fold_len = max(seq_len * 2, 40)
         test_ratio = 0.2
+        
+        # Determine the first drift point for before/after separation
+        first_drift = drift_points[0] if drift_points else None
 
         all_points = sorted(list(set([0] + drift_points + [len(X)])))
         for i in range(len(all_points) - 1):
@@ -79,13 +85,29 @@ class DriftAdaptiveTimeSeriesCV:
                     mae = mean_absolute_error(y_test_aligned, y_pred)
                     metrics_rmse.append(rmse)
                     metrics_mae.append(mae)
-                    print(f"[Adaptive Fold {i+1}] RMSE={rmse:.3f}, MAE={mae:.3f}")
+                    
+                    # Categorize as before or after drift
+                    if first_drift is not None:
+                        if end <= first_drift:
+                            before_drift_rmse.append(rmse)
+                            before_drift_mae.append(mae)
+                            print(f"[Adaptive Fold {i+1}] BEFORE DRIFT - RMSE={rmse:.3f}, MAE={mae:.3f}")
+                        else:
+                            after_drift_rmse.append(rmse)
+                            after_drift_mae.append(mae)
+                            print(f"[Adaptive Fold {i+1}] AFTER DRIFT - RMSE={rmse:.3f}, MAE={mae:.3f}")
+                    else:
+                        print(f"[Adaptive Fold {i+1}] RMSE={rmse:.3f}, MAE={mae:.3f}")
                 else:
                     print(f"[Adaptive Fold {i+1}] Not enough data to calculate metrics.")
             except Exception as e:
                 print(f"[Adaptive Fold {i+1}] Error: {e}")
 
-        return metrics_rmse, metrics_mae
+        return {
+            'all_folds': {'rmse': metrics_rmse, 'mae': metrics_mae},
+            'before_drift': {'rmse': before_drift_rmse, 'mae': before_drift_mae},
+            'after_drift': {'rmse': after_drift_rmse, 'mae': after_drift_mae}
+        }
 
 class BaselineTimeSeriesCV:
     """
@@ -100,13 +122,19 @@ class BaselineTimeSeriesCV:
         if self.n_splits < 1:
             raise ValueError("n_splits must be at least 1.")
 
-    def run(self, X: pd.DataFrame, y: pd.Series) -> Tuple[List[float], List[float]]:
+    def run(self, X: pd.DataFrame, y: pd.Series, drift_points: List[int] = None) -> Dict:
         metrics_rmse, metrics_mae = [], []
+        before_drift_rmse, before_drift_mae = [], []
+        after_drift_rmse, after_drift_mae = [], []
+        
         total_size = len(X)
         
         # Calculate the size of each part. The data is split into n_splits + 1 parts.
         part_size = total_size // (self.n_splits + 1)
         test_ratio = 0.2
+        
+        # Determine the first drift point for before/after separation
+        first_drift = drift_points[0] if drift_points else None
         
         if part_size <= 0:
             raise ValueError("Not enough data for the specified number of splits.")
@@ -162,15 +190,33 @@ class BaselineTimeSeriesCV:
                 if min_len > 0:
                     y_pred_trimmed = y_pred[:min_len]
                     y_test_trimmed = y_test_aligned[:min_len]
+                    
                     rmse = np.sqrt(mean_squared_error(y_test_trimmed, y_pred_trimmed))
                     mae = mean_absolute_error(y_test_trimmed, y_pred_trimmed)
                     metrics_rmse.append(rmse)
                     metrics_mae.append(mae)
-                    print(f"[Baseline Fold {i+1}] RMSE={rmse:.3f}, MAE={mae:.3f}")
+                    
+                    # Categorize as before or after drift
+                    if first_drift is not None:
+                        if fold_end <= first_drift:
+                            before_drift_rmse.append(rmse)
+                            before_drift_mae.append(mae)
+                            print(f"[Baseline Fold {i+1}] BEFORE DRIFT - RMSE={rmse:.3f}, MAE={mae:.3f}")
+                        else:
+                            after_drift_rmse.append(rmse)
+                            after_drift_mae.append(mae)
+                            print(f"[Baseline Fold {i+1}] AFTER DRIFT - RMSE={rmse:.3f}, MAE={mae:.3f}")
+                    else:
+                        print(f"[Baseline Fold {i+1}] RMSE={rmse:.3f}, MAE={mae:.3f}")
                 else:
                     print(f"[Baseline Fold {i+1}] Not enough data to calculate metrics.")
             except Exception as e:
                 print(f"[Baseline Fold {i+1}] Error during model training/prediction: {e}")
                 continue
-                
-        return metrics_rmse, metrics_mae
+        
+        # Return in the same format as DriftAdaptiveTimeSeriesCV for consistency
+        return {
+            'all_folds': {'rmse': metrics_rmse, 'mae': metrics_mae},
+            'before_drift': {'rmse': before_drift_rmse, 'mae': before_drift_mae},
+            'after_drift': {'rmse': after_drift_rmse, 'mae': after_drift_mae}
+        }

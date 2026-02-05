@@ -19,15 +19,29 @@ class ModelComparison:
             print(f"\n{'='*50}")
             print(f"Testing {model_type} Model")
             print(f"{'='*50}")
-            # Adaptive CV uses all detected drift points
+            # Adaptive CV uses all detected drift points and returns structured data
             drift_cv = DriftAdaptiveTimeSeriesCV(model_type, params)
-            drift_rmse, drift_mae = drift_cv.run(X, y, drift_points)
+            drift_results = drift_cv.run(X, y, drift_points)
+            
+            # Extract metrics for compatibility
+            drift_rmse = drift_results['all_folds']['rmse']
+            drift_mae = drift_results['all_folds']['mae']
             
             # Baseline CV uses standard 5-fold splitting
             baseline_cv = BaselineTimeSeriesCV(model_type, params, n_splits=5)
-            base_rmse, base_mae = baseline_cv.run(X, y)
+            baseline_results = baseline_cv.run(X, y, drift_points)
             
-            results[model_type] = {'adaptive_rmse': drift_rmse, 'adaptive_mae': drift_mae, 'baseline_rmse': base_rmse, 'baseline_mae': base_mae}
+            # Extract metrics from baseline results
+            base_rmse = baseline_results['all_folds']['rmse']
+            base_mae = baseline_results['all_folds']['mae']
+            
+            results[model_type] = {
+                'adaptive_rmse': drift_rmse,
+                'adaptive_mae': drift_mae,
+                'baseline_rmse': base_rmse,
+                'baseline_mae': base_mae
+            }
+        
         return results
     
     def print_summary(self, results: Dict, drift_points: List[int] = None, drift_dates: List[str] = None, filename: str = None):
@@ -69,7 +83,7 @@ class ModelComparison:
                 # Baseline CV Results
                 if results[model_type]['baseline_rmse']:
                     avg_rmse = np.mean(results[model_type]['baseline_rmse'])
-                    avg_mae = np.mean(results[model_type]['baseline_rmse'])
+                    avg_mae = np.mean(results[model_type]['baseline_mae'])
                     fold_count = len(results[model_type]['baseline_rmse'])
                     print(f"{model_type:<10} {'Baseline CV':<15} {avg_rmse:<12.3f} {avg_mae:<12.3f} {fold_count:<8} {'✅ Valid':<10}")
                 else:
@@ -179,6 +193,186 @@ class ModelComparison:
             
             f.write("\n" + "="*100 + "\n")
             f.write("End of Report\n")
+        
+        return filename
+    
+    def export_results_csv(self, results: Dict, drift_points: List[int] = None, 
+                           drift_dates: List[str] = None, filename: str = None, 
+                           analyzed_file: str = None) -> str:
+        """Export results to CSV format for easy upload and analysis."""
+        if filename is None:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            filename = f"model_comparison_results_{timestamp}.csv"
+        
+        # Prepare data for CSV export
+        csv_data = []
+        
+        # Add summary information as first rows
+        csv_data.append({
+            'Section': 'Metadata',
+            'Field': 'Generated Date',
+            'Value': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'Model': '',
+            'Strategy': '',
+            'Fold': '',
+            'RMSE': '',
+            'MAE': ''
+        })
+        
+        if analyzed_file:
+            csv_data.append({
+                'Section': 'Metadata',
+                'Field': 'Analyzed File',
+                'Value': analyzed_file,
+                'Model': '',
+                'Strategy': '',
+                'Fold': '',
+                'RMSE': '',
+                'MAE': ''
+            })
+        
+        if drift_points and drift_dates:
+            csv_data.append({
+                'Section': 'Drift Detection',
+                'Field': 'Number of Drift Points',
+                'Value': len(drift_points),
+                'Model': '',
+                'Strategy': '',
+                'Fold': '',
+                'RMSE': '',
+                'MAE': ''
+            })
+            csv_data.append({
+                'Section': 'Drift Detection',
+                'Field': 'Drift Points (Index)',
+                'Value': str(drift_points),
+                'Model': '',
+                'Strategy': '',
+                'Fold': '',
+                'RMSE': '',
+                'MAE': ''
+            })
+            csv_data.append({
+                'Section': 'Drift Detection',
+                'Field': 'Drift Dates',
+                'Value': str(drift_dates),
+                'Model': '',
+                'Strategy': '',
+                'Fold': '',
+                'RMSE': '',
+                'MAE': ''
+            })
+        
+        # Add best model information
+        best_model = self._find_best_model(results)
+        if best_model:
+            best_scores = results[best_model]['adaptive_rmse'] or results[best_model]['baseline_rmse']
+            if best_scores:
+                best_avg_rmse = np.mean(best_scores)
+                csv_data.append({
+                    'Section': 'Best Model (Accuracy)',
+                    'Field': 'Winner',
+                    'Value': best_model,
+                    'Model': '',
+                    'Strategy': '',
+                    'Fold': '',
+                    'RMSE': best_avg_rmse,
+                    'MAE': ''
+                })
+        
+        # Add summary comparison table
+        for model_type in self.models:
+            if model_type in results:
+                # Adaptive CV Results
+                if results[model_type]['adaptive_rmse']:
+                    avg_rmse = np.mean(results[model_type]['adaptive_rmse'])
+                    avg_mae = np.mean(results[model_type]['adaptive_mae'])
+                    fold_count = len(results[model_type]['adaptive_rmse'])
+                    csv_data.append({
+                        'Section': 'Summary',
+                        'Field': 'Average Performance',
+                        'Value': 'Valid',
+                        'Model': model_type,
+                        'Strategy': 'Adaptive CV',
+                        'Fold': fold_count,
+                        'RMSE': avg_rmse,
+                        'MAE': avg_mae
+                    })
+                else:
+                    csv_data.append({
+                        'Section': 'Summary',
+                        'Field': 'Average Performance',
+                        'Value': 'No Data',
+                        'Model': model_type,
+                        'Strategy': 'Adaptive CV',
+                        'Fold': 0,
+                        'RMSE': np.nan,
+                        'MAE': np.nan
+                    })
+                
+                # Baseline CV Results
+                if results[model_type]['baseline_rmse']:
+                    avg_rmse = np.mean(results[model_type]['baseline_rmse'])
+                    avg_mae = np.mean(results[model_type]['baseline_mae'])
+                    fold_count = len(results[model_type]['baseline_rmse'])
+                    csv_data.append({
+                        'Section': 'Summary',
+                        'Field': 'Average Performance',
+                        'Value': 'Valid',
+                        'Model': model_type,
+                        'Strategy': 'Baseline CV',
+                        'Fold': fold_count,
+                        'RMSE': avg_rmse,
+                        'MAE': avg_mae
+                    })
+                else:
+                    csv_data.append({
+                        'Section': 'Summary',
+                        'Field': 'Average Performance',
+                        'Value': 'No Data',
+                        'Model': model_type,
+                        'Strategy': 'Baseline CV',
+                        'Fold': 0,
+                        'RMSE': np.nan,
+                        'MAE': np.nan
+                    })
+        
+        # Add detailed fold results
+        for model_type in self.models:
+            if model_type in results:
+                # Adaptive CV Details
+                if results[model_type]['adaptive_rmse']:
+                    for i, (rmse, mae) in enumerate(zip(results[model_type]['adaptive_rmse'], 
+                                                       results[model_type]['adaptive_mae'])):
+                        csv_data.append({
+                            'Section': 'Detailed Results',
+                            'Field': f'Fold {i+1}',
+                            'Value': 'Adaptive CV',
+                            'Model': model_type,
+                            'Strategy': 'Adaptive CV',
+                            'Fold': i+1,
+                            'RMSE': rmse,
+                            'MAE': mae
+                        })
+                
+                # Baseline CV Details
+                if results[model_type]['baseline_rmse']:
+                    for i, (rmse, mae) in enumerate(zip(results[model_type]['baseline_rmse'], 
+                                                       results[model_type]['baseline_mae'])):
+                        csv_data.append({
+                            'Section': 'Detailed Results',
+                            'Field': f'Fold {i+1}',
+                            'Value': 'Baseline CV',
+                            'Model': model_type,
+                            'Strategy': 'Baseline CV',
+                            'Fold': i+1,
+                            'RMSE': rmse,
+                            'MAE': mae
+                        })
+        
+        # Convert to DataFrame and save
+        df_export = pd.DataFrame(csv_data)
+        df_export.to_csv(filename, index=False, encoding='utf-8-sig')
         
         return filename
     
