@@ -168,17 +168,123 @@ Project/
 
 ---
 
-## ⚙️ การติดตั้ง
+## ⚙️ การติดตั้งและเตรียมสภาพแวดล้อม
 
-### ขั้นตอนที่ 1: ติดตั้ง Dependencies
+### ขั้นตอนที่ 1: ตรวจสอบ Python version
+
+ตรวจสอบว่าคุณมี Python 3.8 ขึ้นไปติดตั้งอยู่ในเครื่อง:
+
+```bash
+python --version
+```
+
+หรือ
+
+```bash
+python3 --version
+```
+
+> ⚠️ **หมายเหตุ:** โปรเจคนี้ต้องการ Python 3.8 ขึ้นไป
+
+---
+
+### ขั้นตอนที่ 2: สร้าง Virtual Environment
+
+Virtual Environment (venv) ช่วยให้โปรเจคแยกการจัดการ dependencies ออกจากระบบหลัก ป้องกันความขัดแย้งระหว่าง package versions
+
+#### บน Windows:
+
+```bash
+# สร้าง virtual environment ชื่อ .venv
+python -m venv .venv
+
+# เปิดใช้งาน virtual environment
+.venv\Scripts\activate
+```
+
+#### บน macOS/Linux:
+
+```bash
+# สร้าง virtual environment ชื่อ .venv
+python3 -m venv .venv
+
+# เปิดใช้งาน virtual environment
+source .venv/bin/activate
+```
+
+✅ **เมื่อเปิดใช้งานสำเร็จ** คุณจะเห็น `(.venv)` ปรากฏหน้าชื่อ terminal ของคุณ เช่น:
+
+```
+(.venv) C:\Users\praph\Desktop\Project>
+```
+
+---
+
+### ขั้นตอนที่ 3: ติดตั้ง Dependencies
+
+เมื่ออยู่ใน virtual environment แล้ว ให้ติดตั้ง libraries ที่จำเป็นทั้งหมด:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### ขั้นตอนที่ 2: ตรวจสอบ Python version
+**Libraries ที่จะถูกติดตั้ง:**
 
-- ต้องการ Python 3.8 ขึ้นไป
+- `numpy >= 1.21.0` - สำหรับการคำนวณทางคณิตศาสตร์และจัดการ array
+- `pandas >= 1.3.0` - สำหรับจัดการและวิเคราะห์ข้อมูล
+- `tensorflow >= 2.8.0` - สำหรับสร้างและเทรนโมเดล deep learning (RNN, LSTM, GRU)
+- `scikit-learn >= 1.0.0` - สำหรับโมเดล machine learning และการประเมินผล
+- `scipy >= 1.7.0` - สำหรับฟังก์ชันทางสถิติขั้นสูง
+- `river >= 0.15.0` - สำหรับ ADWIN algorithm (ตรวจจับ concept drift)
+
+---
+
+### ขั้นตอนที่ 4: ตรวจสอบการติดตั้ง
+
+ตรวจสอบว่า libraries ติดตั้งสำเร็จหรือไม่:
+
+```bash
+pip list
+```
+
+คุณควรเห็นรายการ packages ที่ติดตั้งทั้งหมด รวมถึง dependencies ที่ถูกติดตั้งอัตโนมัติ
+
+---
+
+### 🔄 การปิด Virtual Environment
+
+เมื่อใช้งานเสร็จแล้ว สามารถปิด virtual environment ได้ด้วยคำสั่ง:
+
+```bash
+deactivate
+```
+
+---
+
+### 💡 เคล็ดลับการใช้งาน
+
+1. **เปิด virtual environment ทุกครั้ง** ก่อนรันโปรแกรม:
+   - Windows: `.venv\Scripts\activate`
+   - macOS/Linux: `source .venv/bin/activate`
+
+2. **อัพเดต pip** ก่อนติดตั้ง libraries:
+
+   ```bash
+   python -m pip install --upgrade pip
+   ```
+
+3. **แก้ปัญหา TensorFlow บน Windows:**
+   หาก TensorFlow ติดตั้งไม่สำเร็จ ให้ลองใช้:
+
+   ```bash
+   pip install tensorflow-cpu
+   ```
+
+4. **การติดตั้งบน macOS (Apple Silicon M1/M2):**
+   ```bash
+   pip install tensorflow-macos
+   pip install tensorflow-metal  # สำหรับ GPU acceleration
+   ```
 
 ---
 
